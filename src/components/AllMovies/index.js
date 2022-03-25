@@ -17,10 +17,10 @@ function AllMovies(){
 
     return(
         <Movies>
-        <h2>Selecione o filme</h2>
-        <Posters>
-        {movies.map(movie =>  <Link to={`/images/${movie.id}`}><img src={movie.posterURL} /></Link>)}
-        </Posters>
+            <h2>Selecione o filme</h2>
+            <Posters>
+                {movies.map(movie =>  <Link key={movie.id} to={`/filme/${movie.id}`}><img src={movie.posterURL} alt={movie.title}/></Link>)}
+            </Posters>
         </Movies>
     )
 }
@@ -28,6 +28,8 @@ function AllMovies(){
 const Movies = styled.section`
     display:flex;
     flex-direction: column;
+    font-family: 'Roboto', sans-serif;
+    
 
     h2{
         display: flex;
