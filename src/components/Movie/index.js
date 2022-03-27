@@ -3,13 +3,15 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import styled from "styled-components";
 
+import Footer from "../Footer";
+
 function Movie(){
     const {movieId} = useParams();
-    const [days, setDays] = useState(null);
+    const [movie, setMovie] = useState(null);
 
     useEffect(()=>{
         const promise = axios.get(`https://mock-api.driven.com.br/api/v5/cineflex/movies/${movieId}/showtimes`);
-        promise.then(answer => setDays(answer.data.days));
+        promise.then(answer => setMovie(answer.data));
     },[]);
 
     function ShowSessions({weekday, date, showtimes, id}){
@@ -23,14 +25,15 @@ function Movie(){
         )
     }
 
-    if(days === null) {
+    if(movie === null) {
 		return <h2>LOADING....</h2>;
 	}
 
     return(
         <Sessions>
-            <h2>Selecione o horário</h2>
-            {days.map(day => ShowSessions(day))}
+            <h3>Selecione o horário</h3>
+            {movie.days.map(day => ShowSessions(day))}
+            <Footer title={movie.title} poster={movie.posterURL}/>
         </Sessions>
     )
 }
@@ -38,9 +41,10 @@ function Movie(){
 const Sessions = styled.section`
     display:flex;
     flex-direction: column;
-    margin-bottom: 30px;
+    margin-bottom: 130px;
+    font-family: 'Roboto', sans-serif;
 
-    h2{
+    h3{
         display: flex;
         align-itens: center;
         justify-content: center;
@@ -53,7 +57,7 @@ const Weekday = styled.div`
     margin-left: 24px;
 `
 
-const Date = styled.h3`
+const Date = styled.h4`
     font-size: 20px; 
     margin: 22px 0;
 `
