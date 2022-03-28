@@ -53,26 +53,24 @@ function Session(){
 }
 
 function ShowSeats(seat,index, selectedSeats, setSelectedSeats){
-    // const [selected,setSelected] = useState(false);
-    console.log('passou');
+    const [selected,setSelected] = useState(false);
+    // console.log('passou');
     let color;
     let borderColor;
-    let selected = false;
+    // let selected = false;
 
     function selectSeat(){
         if(!selected){
             const array = [...selectedSeats, index];
-            selected = true;
             setSelectedSeats(array);
         } else{
             const array = selectedSeats.filter(seat => seat !== index);
             console.log('array = ' + array);
             setSelectedSeats(array);
-            selected = false;
             console.log(selectedSeats);
         }
+        setSelected(!selected);
     }
-    //    setSelected(!selected);
 
     if(seat.isAvailable){
         if(!selected){
