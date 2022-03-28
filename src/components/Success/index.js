@@ -9,8 +9,6 @@ export default function Success() {
   const navigate = useNavigate();
   const seats = selectedSeats.map(seat => seat - session.seats[0].id);
 
-  console.log(parseInt(CPF));
-
   return(
   <Order>
       <h3>Pedido feito com sucesso!</h3>

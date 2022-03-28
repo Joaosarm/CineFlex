@@ -15,7 +15,6 @@ function Session(){
     const [selected,setSelected] = useState([]);
 
     console.log(selectedSeats);
-    console.log(selected);
 
     useEffect(()=>{
         const promise = axios.get(`https://mock-api.driven.com.br/api/v5/cineflex/showtimes/${sessionId}/seats`);
@@ -31,11 +30,15 @@ function Session(){
         }else if(selectedSeats.length<1){
             alert('Nenhum assento selecionado!');
         }else{
-
-            const data = {ids: selectedSeats, name: name,  cpf: CPF};
-            const promise = axios.post("https://mock-api.driven.com.br/api/v4/cineflex/seats/book-many", data);
+            const data = {
+                ids: selectedSeats,
+                name: name,
+                cpf: CPF
+            };
+            const promise = axios.post("https://mock-api.driven.com.br/api/v5/cineflex/seats/book-many", data);
             promise.then(()=>{
-            navigate('/sucesso', { state: { name, CPF, session, selectedSeats} });
+                console.log('conseguiu');
+                navigate('/sucesso', { state: { name, CPF, session, selectedSeats} });
         })
         promise.catch(()=> alert('Erro na hora de enviar dados'))
     }
@@ -48,7 +51,6 @@ function Session(){
         <ChooseSeats>
             <h3>Selecione o(s) assento(s)</h3>
             <Seats>
-                {console.log('veio aqui')}
                 {session.seats.map((seat,index) => ShowSeats(seat, index, selectedSeats, setSelectedSeats, selected,setSelected))}
             <Captions>
                 <Caption color='#8DD7CF' borderColor='#1AAE9E'><div></div><p>Selecionado</p></Caption>
