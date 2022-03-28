@@ -12,7 +12,10 @@ function Session(){
     const [CPF, setCPF] = useState('');
     const navigate = useNavigate();
     const [selectedSeats, setSelectedSeats] = useState([]);
+    const [selected,setSelected] = useState([]);
+
     console.log(selectedSeats);
+    console.log(selected);
 
     useEffect(()=>{
         const promise = axios.get(`https://mock-api.driven.com.br/api/v5/cineflex/showtimes/${sessionId}/seats`);
@@ -21,59 +24,68 @@ function Session(){
 
     function reservar(event){
         event.preventDefault();
-        navigate('/sucesso', { state: { name, CPF, session, selectedSeats } });
+        const CPFModel = /^\d{3}\.\d{3}\.\d{3}\-\d{2}$/;
+        const isCPF = CPFModel.test(CPF);
+        if(!isCPF){
+            alert('CPF nao existente, por favor digitar no formato 000.000.000-00');
+        }else if(selectedSeats.length<1){
+            alert('Nenhum assento selecionado!');
+        }else{
+
+            const data = {ids: selectedSeats, name: name,  cpf: CPF};
+            const promise = axios.post("https://mock-api.driven.com.br/api/v4/cineflex/seats/book-many", data);
+            promise.then(()=>{
+            navigate('/sucesso', { state: { name, CPF, session, selectedSeats} });
+        })
+        promise.catch(()=> alert('Erro na hora de enviar dados'))
+    }
     }
 
-
-    if(session === null) {
+    if(session===null||session.length<1) {
 		return <h2>LOADING....</h2>;
-	}
-
+	}else{
     return (
         <ChooseSeats>
             <h3>Selecione o(s) assento(s)</h3>
             <Seats>
-            {session.seats.map((seat,index) => ShowSeats(seat, index, selectedSeats, setSelectedSeats))}
+                {console.log('veio aqui')}
+                {session.seats.map((seat,index) => ShowSeats(seat, index, selectedSeats, setSelectedSeats, selected,setSelected))}
             <Captions>
                 <Caption color='#8DD7CF' borderColor='#1AAE9E'><div></div><p>Selecionado</p></Caption>
                 <Caption color='#C3CFD9' borderColor='#7B8B99'><div></div><p>Disponível</p></Caption>
                 <Caption color='#FBE192' borderColor='#F7C52B'><div></div><p>Indisponível</p></Caption>
             </Captions>
             </Seats>
+            <p>Assentos selecionados: {selected.map(select => select + '  ')}</p>
             <form onSubmit={reservar}>
                 <label htmlFor="campoNome">Nome do comprador:</label>
-		        <input type="text" id="campoNome" placeholder="Digite seu nome..." value={name} onChange={e => setName( e.target.value)} required/>
+		        <input type="text" id="campoNome" placeholder="Digite seu nome..." value={name} onChange={e => setName(e.target.value)} required/>
                 <label htmlFor="campoCPF">CPF do comprador:</label>
-		        <input type="number" id="campoCPF" placeholder="Digite seu CPF..." value={CPF} onChange={e => setCPF(e.target.value)} required/>
+		        <input type="text" id="campoCPF" placeholder="Digite seu CPF..." value={CPF} onChange={e => setCPF(e.target.value) } required/>
 		        <button type="submit">Reservar assento(s)</button>
 		    </form>
-            <Footer title={session.movie.title} poster={session.movie.posterURL} weekday={session.day.weekday} date={session.day.date}/>
+            <Footer title={session.movie.title} poster={session.movie.posterURL} weekday={session.day.weekday} name={session.name}/>
         </ChooseSeats>
-    )
+    )}
 }
-
-function ShowSeats(seat,index, selectedSeats, setSelectedSeats){
-    const [selected,setSelected] = useState(false);
-    // console.log('passou');
+function ShowSeats(seat,index, selectedSeats, setSelectedSeats, selected,setSelected){
     let color;
     let borderColor;
     // let selected = false;
 
     function selectSeat(){
-        if(!selected){
-            const array = [...selectedSeats, index];
-            setSelectedSeats(array);
+        const array = [...selectedSeats]
+        const find = array.findIndex(element => element === seat.id);
+        if(find>-1){
+            setSelectedSeats(selectedSeats.filter(element => element!== seat.id));
+            setSelected(selected.filter(element => element!== index));
         } else{
-            const array = selectedSeats.filter(seat => seat !== index);
-            console.log('array = ' + array);
-            setSelectedSeats(array);
-            console.log(selectedSeats);
-        }
-        setSelected(!selected);
+        setSelectedSeats([...selectedSeats, seat.id]);
+        setSelected([...selected, index]);}
     }
 
     if(seat.isAvailable){
-        if(!selected){
+        if(selected){
             color='#C3CFD9';
             borderColor='#808F9D';
         }else{
@@ -82,8 +94,7 @@ function ShowSeats(seat,index, selectedSeats, setSelectedSeats){
         }
         
         return (
-            <Seat onClick={selectSeat} key={index} color={color} borderColor={borderColor}>{index}</Seat>
-
+            <Seat onClick={() => selectSeat()} key={index} color={color} borderColor={borderColor}>{index}</Seat>
         )
     }
     
@@ -115,7 +126,10 @@ const ChooseSeats = styled.section`
         width: 330px;
         font-size:18px;
         color:#293845;
-        margin:42px;
+        margin:22px;
+    }
+    p{
+        margin: 10px;
     }
     form input{
         border: 1px solid #D5D5D5;

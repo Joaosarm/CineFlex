@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 function Footer(props){
 
-    return !props.date ? (
+    return !props.name ? (
         <Session>
             <img src={props.poster} alt={props.title}/>
             <h2>{props.title}</h2>
@@ -10,7 +10,7 @@ function Footer(props){
         ):(
         <Session>
             <img src={props.poster} alt={props.title}/>
-            <div><h2>{props.title}</h2><h2>{props.weekday} - {props.date}</h2></div>
+            <div><h2>{props.title}</h2><h2>{props.weekday} - {props.name}</h2></div>
         </Session>
     )
 }

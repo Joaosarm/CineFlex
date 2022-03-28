@@ -1,12 +1,16 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
+
 
 
 export default function Success() {
   const location = useLocation();
   const {name, CPF, session, selectedSeats} = location.state;
   const navigate = useNavigate();
-  console.log(selectedSeats);
+  const seats = selectedSeats.map(seat => seat - session.seats[0].id);
+
+  console.log(parseInt(CPF));
+
   return(
   <Order>
       <h3>Pedido feito com sucesso!</h3>
@@ -14,7 +18,7 @@ export default function Success() {
       <p>{session.movie.title}</p>
       <p>{session.day.date} {session.name}</p>
       <h4>Ingressos</h4>
-      {selectedSeats.map(seat => <p>Assento {seat}</p> )}
+      {seats.map((seat, index) => <p key = {index}>Assento {seat}</p> )}
       <h4>Comprador</h4>
       <p>Nome: {name}</p>
       <p>CPF: {CPF}</p>
